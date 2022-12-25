@@ -9,12 +9,13 @@ public class Main extends JavaPlugin {
         // Register each of the following commands (set an instance of each command's class as executor)
         this.getCommand("terrainanalyzerconfigreload").setExecutor(new CommandTerrainAnalyzerConfigReload());
 
-        // Register each of the following Event Listeners (set an instance of each command's class as executor)
-        getServer().getPluginManager().registerEvents(new SneakListener(), this);
-
         // Create config file from jar config file
         this.saveDefaultConfig();
         // This thread is really useful https://www.spigotmc.org/threads/whats-the-difference-between-savedefaultconfig-copydefaults.301865/
+        
+        
+
+
     }
 
     @Override
