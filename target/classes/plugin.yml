@@ -7,3 +7,5 @@ description: Analyze your world terrain, such as average terrain height!
 commands:
   terrainanalyzerconfigreload:
     description: Reloads the config
+  analyzeterrain:
+    description: Analyze your world terrain, such as average terrain height!
