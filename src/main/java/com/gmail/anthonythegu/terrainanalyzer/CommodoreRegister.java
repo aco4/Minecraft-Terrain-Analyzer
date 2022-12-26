@@ -14,10 +14,9 @@ public class CommodoreRegister {
 
         commodore.register(command, LiteralArgumentBuilder.literal("analyzeterrain")
                 .then(RequiredArgumentBuilder.argument("chunk", StringArgumentType.string())
-                        .then(RequiredArgumentBuilder.argument("height", StringArgumentType.string())
-                                .then(RequiredArgumentBuilder.argument("ignore", StringArgumentType.string())
-                                        .then(RequiredArgumentBuilder.argument("BLOCK1,BLOCK2...",
-                                                StringArgumentType.string())))))
+                        .then(RequiredArgumentBuilder.argument("ignore", StringArgumentType.string())
+                                .then(RequiredArgumentBuilder.argument("BLOCK1,BLOCK2...",
+                                        StringArgumentType.string()))))
                 .then(RequiredArgumentBuilder.argument("scan", StringArgumentType.string())));
     }
 }
