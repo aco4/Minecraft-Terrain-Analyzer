@@ -36,17 +36,21 @@ public class TerrainScanner {
         }
     }
 
-    public static void scanChunk(Player player, ArrayList<Material> ignored) {
+    public static void scanChunk(Player player, String ignored) {
         Chunk chunk = player.getLocation().getChunk();
         World world = player.getWorld();
         RollingAverage rollingAverage = new RollingAverage();
         RollingMode rollingMode = new RollingMode();
+        ArrayList<Material> ignoredBlocks = toMaterials(ignored);
 
-        for (int x = chunk.getX(); x < 16; x++) {
-            for (int z = chunk.getZ(); z < 16; z++) {
-                Location location = new Location(world, x, 0, z);
+        int cornerX = 16 * chunk.getX();
+        int cornerZ = 16 * chunk.getZ();
 
-                int highest = ignored.size() > 0 ? getHighestBlockFiltered(world, location, ignored)
+        for (int dx = 0; dx < 16; dx++) {
+            for (int dz = 0; dz < 16; dz++) {
+                Location location = new Location(world, cornerX + dx, 0, cornerZ + dz);
+
+                int highest = ignoredBlocks.size() > 0 ? getHighestBlockFiltered(world, location, ignoredBlocks)
                         : world.getHighestBlockYAt(location);
 
                 rollingAverage.add(highest);
@@ -77,5 +81,17 @@ public class TerrainScanner {
                 break;
         }
         return y;
+    }
+
+    private static ArrayList<Material> toMaterials(String string) {
+        ArrayList<Material> out = new ArrayList<>();
+        if (string.length() > 0) {
+            for (String block : string.toUpperCase().split(",")) {
+                Material material = Material.getMaterial(block);
+                if (material != null)
+                    out.add(material);
+            }
+        }
+        return out;
     }
 }

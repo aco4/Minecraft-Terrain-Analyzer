@@ -1,9 +1,6 @@
 package com.gmail.anthonythegu.terrainanalyzer;
 
-import java.util.ArrayList;
-
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +19,7 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
 
             if (args.length == 1) {
                 if (args[0].toLowerCase().equals("chunk")) { // analyzeterrain chunk
-                    TerrainScanner.scanChunk((Player) sender, new ArrayList<Material>());
+                    TerrainScanner.scanChunk((Player) sender, "");
                     return false;
                 } else if (args[0].toLowerCase().equals("scan")) { // analyzeterrain scan
                     sender.sendMessage(
@@ -52,7 +49,7 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             if (args.length == 3) {
                 if (args[0].toLowerCase().equals("chunk")) {
                     if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore stone
-                        TerrainScanner.scanChunk((Player) sender, toMaterials(args[2]));
+                        TerrainScanner.scanChunk((Player) sender, args[2]);
                         return true;
                     } else { // analyzeterrain chunk blah blah
                         sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
@@ -80,17 +77,5 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             }
         }
         return false;
-    }
-
-    private ArrayList<Material> toMaterials(String string) {
-        String upper = string.toUpperCase();
-        String[] arr = upper.split(",");
-        ArrayList<Material> arrList = new ArrayList<>();
-        for (String s : arr) {
-            Material toAdd = Material.getMaterial(s);
-            if (toAdd != null)
-                arrList.add(toAdd);
-        }
-        return arrList;
     }
 }
