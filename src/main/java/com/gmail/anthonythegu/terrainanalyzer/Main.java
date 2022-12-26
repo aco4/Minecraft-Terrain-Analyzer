@@ -30,7 +30,7 @@ public class Main extends JavaPlugin {
             Commodore commodore = CommodoreProvider.getCommodore(this);
 
             // register your completions.
-            CommodoreRegister.registerCompletions(commodore, analyzeterrain, this);
+            CommodoreRegister.registerCompletions(commodore, analyzeterrain);
         }
     }
 }

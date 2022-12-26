@@ -16,64 +16,67 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
 
         if (sender instanceof Player) {
             if (args.length == 0) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|startscan|stopscan)");
+                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
                 return false;
             }
 
-            if (args.length == 1
-                    && args[0].toLowerCase().equals("chunk")) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk (average|mode) [ignore] <blocks>");
-                return false;
+            if (args.length == 1) {
+                if (args[0].toLowerCase().equals("chunk")) { // analyzeterrain chunk
+                    TerrainScanner.scanChunk((Player) sender, new ArrayList<Material>());
+                    return false;
+                } else if (args[0].toLowerCase().equals("scan")) { // analyzeterrain scan
+                    sender.sendMessage(
+                            ChatColor.RED + "ERROR: This command is in beta and has not been implemented yet!");
+                    return false;
+                } else { // analyzeterrain blah
+                    sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
+                    return false;
+                }
             }
 
-            if (args.length == 3
-                    && args[0].toLowerCase().equals("chunk")
-                    && args[1].toLowerCase().equals("average")
-                    && args[2].toLowerCase().equals("ignore")) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk average ignore <blocks>");
-                return false;
+            if (args.length == 2) {
+                if (args[0].toLowerCase().equals("chunk")) {
+                    if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore
+                        sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk ignore <blocks>");
+                        return false;
+                    } else { // analyzeterrain chunk blah
+                        sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
+                        return false;
+                    }
+                } else { // analyzeterrain blah blah
+                    sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
+                    return false;
+                }
             }
 
-            if (args.length == 3
-                    && args[0].toLowerCase().equals("chunk")
-                    && args[1].toLowerCase().equals("mode")
-                    && args[2].toLowerCase().equals("ignore")) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk mode ignore <blocks>");
-                return false;
+            if (args.length == 3) {
+                if (args[0].toLowerCase().equals("chunk")) {
+                    if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore stone
+                        TerrainScanner.scanChunk((Player) sender, toMaterials(args[3]));
+                        return true;
+                    } else { // analyzeterrain chunk blah blah
+                        sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
+                        return false;
+                    }
+                } else { // analyzeterrain blah blah blah
+                    sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
+                    return false;
+                }
             }
 
-            if (args.length > 4
-                    && args[0].toLowerCase().equals("chunk")
-                    && args[1].toLowerCase().equals("average")) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk average ignore <block1,block2>");
-                return false;
-            }
-
-            if (args.length > 4
-                    && args[0].toLowerCase().equals("chunk")
-                    && args[1].toLowerCase().equals("mode")) {
-                sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk mode ignore <block1,block2>");
-                return false;
-            }
-
-            if (args.length == 1 && args[0].toLowerCase().equals("startscan")) {
-                sender.sendMessage(ChatColor.RED + "ERROR: This command is in beta and has not been implemented yet!");
-                return false;
-            }
-
-            if (args.length == 1 && args[0].toLowerCase().equals("stopscan")) {
-                sender.sendMessage(ChatColor.RED + "ERROR: This command is in beta and has not been implemented yet!");
-                return false;
-            }
-
-            if (args.length == 2 && args[0].toLowerCase().equals("chunk") && args[1].toLowerCase().equals("average")) {
-                TerrainScanner.scanChunk((Player) sender, new ArrayList<Material>());
-                return true;
-            }
-
-            if (args[0].toLowerCase().equals("chunk") && args[1].toLowerCase().equals("average")) {
-                TerrainScanner.scanChunk((Player) sender, toMaterials(args[3]));
-                return true;
+            if (args.length >= 4) {
+                if (args[0].toLowerCase().equals("chunk")) {
+                    if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore stone water
+                        sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk ignore BLOCK1,BLOCK2...");
+                        return false;
+                    } else { // analyzeterrain chunk blah blah blah
+                        sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
+                        return false;
+                    }
+                } else { // analyzeterrain blah blah blah blah
+                    sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
+                    return false;
+                }
             }
         }
         return false;
@@ -84,7 +87,9 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
         String[] arr = upper.split(",");
         ArrayList<Material> arrList = new ArrayList<>();
         for (String s : arr) {
-            arrList.add(Material.getMaterial(s));
+            Material toAdd = Material.getMaterial(s);
+            if (toAdd != null)
+                arrList.add(toAdd);
         }
         return arrList;
     }
