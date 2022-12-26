@@ -67,7 +67,7 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             }
 
             if (args.length == 2 && args[0].toLowerCase().equals("chunk") && args[1].toLowerCase().equals("average")) {
-                TerrainScanner.scanChunk((Player) sender, new ArrayList<>());
+                TerrainScanner.scanChunk((Player) sender, new ArrayList<Material>());
                 return true;
             }
 
