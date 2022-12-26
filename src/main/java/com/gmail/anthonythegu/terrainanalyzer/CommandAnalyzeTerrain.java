@@ -52,7 +52,7 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             if (args.length == 3) {
                 if (args[0].toLowerCase().equals("chunk")) {
                     if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore stone
-                        TerrainScanner.scanChunk((Player) sender, toMaterials(args[3]));
+                        TerrainScanner.scanChunk((Player) sender, toMaterials(args[2]));
                         return true;
                     } else { // analyzeterrain chunk blah blah
                         sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
