@@ -1,7 +1,7 @@
 name: TerrainAnalyzer
 main: com.gmail.anthonythegu.terrainanalyzer.Main
-version: 0.0.0
-api-version: 1.19.3
+version: 0.0.1
+api-version: 1.19
 author: Crayola#2819
 description: Analyze your world terrain, such as average terrain height!
 commands:
