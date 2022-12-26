@@ -1,0 +1,11 @@
+analyzeterrain {
+  chunkheight {
+    average;
+    mode;
+    ignore {
+        block1,block2,etc;
+    }
+  }
+  startscan;
+  stopscan;
+}
