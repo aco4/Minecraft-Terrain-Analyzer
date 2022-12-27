@@ -12,6 +12,9 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (sender instanceof Player) {
+
+            Player p = (Player) sender;
+
             if (args.length == 0) {
                 sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (chunk|scan) [ignore]");
                 return false;
@@ -19,8 +22,10 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
 
             if (args.length == 1) {
                 if (args[0].toLowerCase().equals("chunk")) { // analyzeterrain chunk
-                    TerrainScanner.scanChunk((Player) sender, "");
-                    return false;
+                    Statistics s = TerrainScanner.scanChunk(p, "");
+                    p.sendMessage(prefix() + " The average height of this chunk is " + s.average() + " blocks");
+                    p.sendMessage(prefix() + " The mode height of this chunk is " + s.mode() + " blocks");
+                    return true;
                 } else if (args[0].toLowerCase().equals("scan")) { // analyzeterrain scan
                     sender.sendMessage(
                             ChatColor.RED + "ERROR: This command is in beta and has not been implemented yet!");
@@ -49,7 +54,9 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             if (args.length == 3) {
                 if (args[0].toLowerCase().equals("chunk")) {
                     if (args[1].toLowerCase().equals("ignore")) { // analyzeterrain chunk ignore stone
-                        TerrainScanner.scanChunk((Player) sender, args[2]);
+                        Statistics s = TerrainScanner.scanChunk(p, args[2]);
+                        p.sendMessage(prefix() + " The average height of this chunk is " + s.average() + " blocks");
+                        p.sendMessage(prefix() + " The mode height of this chunk is " + s.mode() + " blocks");
                         return true;
                     } else { // analyzeterrain chunk blah blah
                         sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain chunk [ignore] <blocks>");
@@ -77,5 +84,9 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
             }
         }
         return false;
+    }
+
+    private static String prefix() {
+        return ChatColor.DARK_AQUA + "[TerrainScanner]" + ChatColor.RESET;
     }
 }

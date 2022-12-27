@@ -7,78 +7,53 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class TerrainScanner {
-    private ArrayList<Chunk> scannedChunks;
-    private RollingMode rMode;
+    private static final int WORLD_UPPER = 319;
     private static final int WORLD_LOWER = -64;
 
-    public TerrainScanner() {
-        scannedChunks = new ArrayList<>();
-        rMode = new RollingMode();
-    }
+    // private boolean registerChunk(Chunk chunk) {
+    // if (!scannedChunks.contains(chunk)) {
+    // scannedChunks.add(chunk);
+    // return true;
+    // }
+    // return false;
+    // }
 
-    public void scan(Player player) {
-        Chunk chunk = player.getLocation().getChunk();
+    public static Statistics scanChunk(Chunk chunk, String ignored) {
 
-        if (chunkHasBeenScanned(chunk))
-            return;
+        Statistics statistics = new Statistics();
+        ArrayList<Material> filter = toMaterials(ignored);
 
-        scannedChunks.add(chunk);
-        World world = player.getWorld();
+        for (int x = chunk.getX(); x < chunk.getX() + 16; x++) {
+            for (int z = chunk.getZ(); z < chunk.getZ() + 16; z++) {
+                Location location = new Location(chunk.getWorld(), x, 0, z);
 
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                Location location = new Location(world, x, 0, z);
-                rMode.add(world.getHighestBlockYAt(location));
+                int highestY = getTerrainHeight(location, filter);
+                statistics.add(highestY);
             }
         }
+        return statistics;
     }
 
-    public static void scanChunk(Player player, String ignored) {
-        Chunk chunk = player.getLocation().getChunk();
-        World world = player.getWorld();
-        RollingAverage rollingAverage = new RollingAverage();
-        RollingMode rollingMode = new RollingMode();
-        ArrayList<Material> ignoredBlocks = toMaterials(ignored);
-
-        int cornerX = 16 * chunk.getX();
-        int cornerZ = 16 * chunk.getZ();
-
-        for (int dx = 0; dx < 16; dx++) {
-            for (int dz = 0; dz < 16; dz++) {
-                Location location = new Location(world, cornerX + dx, 0, cornerZ + dz);
-
-                int highest = ignoredBlocks.size() > 0 ? getHighestBlockFiltered(world, location, ignoredBlocks)
-                        : world.getHighestBlockYAt(location);
-
-                rollingAverage.add(highest);
-                rollingMode.add(highest);
-            }
-        }
-        player.sendMessage(
-                ChatColor.DARK_AQUA + "[TerrainScanner]" + ChatColor.RESET + " The average height of this chunk is "
-                        + rollingAverage.get() + " blocks");
-        player.sendMessage(
-                ChatColor.DARK_AQUA + "[TerrainScanner]" + ChatColor.RESET + " The mode height of this chunk is "
-                        + rollingMode.get() + " blocks");
+    public static Statistics scanChunk(Player player, String ignored) {
+        return scanChunk(player.getLocation().getChunk(), ignored);
     }
 
-    private boolean chunkHasBeenScanned(Chunk chunk) {
-        for (Chunk c : scannedChunks) {
-            if (chunk == c)
-                return true;
-        }
-        return false;
-    }
+    private static int getTerrainHeight(Location location, ArrayList<Material> ignored) {
 
-    private static int getHighestBlockFiltered(World w, Location loc, ArrayList<Material> ignored) {
+        World w = location.getWorld();
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+
         int y;
-        for (y = w.getHighestBlockYAt(loc); y >= WORLD_LOWER; y--) {
-            loc.setY(y);
-            if (ignored.contains(loc.getBlock().getType()))
-                break;
+        for (y = WORLD_UPPER; y >= WORLD_LOWER; y--) {
+            Location l = new Location(w, x, y, z);
+            Block b = l.getBlock();
+            if (!b.isPassable() && !ignored.contains(b.getType()))
+                return y;
         }
         return y;
     }
@@ -86,8 +61,8 @@ public class TerrainScanner {
     private static ArrayList<Material> toMaterials(String string) {
         ArrayList<Material> out = new ArrayList<>();
         if (string.length() > 0) {
-            for (String block : string.toUpperCase().split(",")) {
-                Material material = Material.getMaterial(block);
+            for (String block : string.split(",")) {
+                Material material = Material.matchMaterial(block);
                 if (material != null)
                     out.add(material);
             }
