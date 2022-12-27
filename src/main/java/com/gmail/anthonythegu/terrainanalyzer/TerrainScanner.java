@@ -26,8 +26,8 @@ public class TerrainScanner {
         Statistics statistics = new Statistics();
         ArrayList<Material> filter = toMaterials(ignored);
 
-        for (int x = chunk.getX(); x < chunk.getX() + 16; x++) {
-            for (int z = chunk.getZ(); z < chunk.getZ() + 16; z++) {
+        for (int x = 16 * chunk.getX(); x < chunk.getX() + 16; x++) {
+            for (int z = 16 * chunk.getZ(); z < chunk.getZ() + 16; z++) {
                 Location location = new Location(chunk.getWorld(), x, 0, z);
 
                 int highestY = getTerrainHeight(location, filter);
