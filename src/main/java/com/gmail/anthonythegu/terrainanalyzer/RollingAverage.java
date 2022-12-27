@@ -7,7 +7,9 @@ public class RollingAverage {
     private int count;
 
     public int get() {
-        return count == 0 ? 0 : sum / count;
+        if (count == 0)
+            throw new IllegalStateException("Cannot get rolling average: no data to calculate");
+        return sum / count;
     }
 
     public void add(int num) {
