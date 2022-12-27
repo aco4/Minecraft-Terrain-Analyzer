@@ -7,7 +7,7 @@ public class RollingAverage {
     private int count;
 
     public int get() {
-        return sum / count;
+        return count == 0 ? 0 : sum / count;
     }
 
     public void add(int num) {
