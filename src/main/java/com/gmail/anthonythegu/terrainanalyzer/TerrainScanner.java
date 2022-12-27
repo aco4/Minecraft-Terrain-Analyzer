@@ -53,7 +53,7 @@ public class TerrainScanner {
         for (y = WORLD_UPPER; y >= WORLD_LOWER; y--) {
             Location l = new Location(w, x, y, z);
             Block b = l.getBlock();
-            if (!b.isPassable() && !ignored.contains(b.getType()))
+            if ((!b.isPassable() || b.isLiquid()) && !ignored.contains(b.getType()))
                 return y;
         }
         return y;
