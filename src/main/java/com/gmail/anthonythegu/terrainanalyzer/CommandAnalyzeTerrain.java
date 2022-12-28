@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 
 public class CommandAnalyzeTerrain implements CommandExecutor {
 
+    private GlobalTerrainScanner globalTerrainScanner;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -41,13 +43,18 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
                             + " blocks");
                     return true;
 
+                } else if (args[0].toLowerCase().equals("global")) { // EX: analyzeterrain global
+
+                    p.sendMessage(globalTerrainScanner.showStatistics());
+                    return true;
+
                 } else { // EX: analyzeterrain blah
                     sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (thischunk|loadedchunks) [ignore]");
                     return false;
                 }
             }
 
-            if (args.length == 2) {  // EX: analyzeterrain thischunk ignore
+            if (args.length == 2) { // EX: analyzeterrain thischunk ignore
                 sender.sendMessage(
                         ChatColor.RED + "Usage: /analyzeterrain (thischunk|loadedchunks) [ignore] [<blocks>]");
                 return false;
@@ -76,7 +83,8 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
                     return true;
 
                 } else { // EX: analyzeterrain blah ignore stone
-                    sender.sendMessage(ChatColor.RED + "Usage: /analyzeterrain (thischunk|loadedchunks) ignore <blocks>");
+                    sender.sendMessage(
+                            ChatColor.RED + "Usage: /analyzeterrain (thischunk|loadedchunks) ignore <blocks>");
                     return false;
                 }
             }
@@ -89,6 +97,10 @@ public class CommandAnalyzeTerrain implements CommandExecutor {
         }
         return false;
 
+    }
+
+    public void registerScanner(GlobalTerrainScanner scanner) {
+        globalTerrainScanner = scanner;
     }
 
     private static String prefix() {

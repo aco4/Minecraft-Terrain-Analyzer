@@ -15,7 +15,19 @@ public class Main extends JavaPlugin {
         getCommand("terrainanalyzerconfigreload").setExecutor(new CommandTerrainAnalyzerConfigReload());
 
         PluginCommand analyzeterrain = getCommand("analyzeterrain");
-        analyzeterrain.setExecutor(new CommandAnalyzeTerrain());
+        CommandAnalyzeTerrain executor = new CommandAnalyzeTerrain();
+        analyzeterrain.setExecutor(executor);
+
+        // Register the command within the scanner
+        GlobalTerrainScanner globalTerrainScanner = new GlobalTerrainScanner(this.getServer().getWorlds().get(0));
+        globalTerrainScanner.registerCommand(executor);
+
+        // Register the scanner within the listener
+        ChunkLoadListener listener = new ChunkLoadListener();
+        listener.registerScanner(globalTerrainScanner);
+
+        // Register the listener
+        getServer().getPluginManager().registerEvents(listener, this);
 
         // Create config file from jar config file
         saveDefaultConfig();
