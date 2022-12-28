@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -54,21 +57,22 @@ public class GlobalTerrainScanner {
             for (int x = cx; x < cx + 16; x++) {
                 for (int z = cz; z < cz + 16; z++) {
                     Location location = new Location(world, x, 0, z);
-                    if (!EXCLUDED.contains(location.getBlock().getType())) {
+                    Block block = getHighestBlock(location);
 
-                        int th = getTerrainHeight(location);
+                    if (block != null && !EXCLUDED.contains(block.getType())) {
+                        int height = block.getY();
 
-                        scannerData.add(th);
+                        scannerData.add(height);
 
-                        Biome b = location.getBlock().getBiome();
-                        Statistics biomeStatistics = biomeData.get(b);
+                        Biome biome = location.getBlock().getBiome();
+                        Statistics biomeStatistics = biomeData.get(biome);
 
-                        if (biomeData.get(b) == null) {
+                        if (biomeData.get(biome) == null) {
                             biomeStatistics = new Statistics();
-                            biomeData.put(b, biomeStatistics);
+                            biomeData.put(biome, biomeStatistics);
                         }
 
-                        biomeStatistics.add(th);
+                        biomeStatistics.add(height);
                     }
                 }
             }
@@ -79,15 +83,15 @@ public class GlobalTerrainScanner {
         StringBuilder sb = new StringBuilder();
 
         sb.append(ChatColor.DARK_AQUA + "[TerrainAnalyzer]" + ChatColor.RESET + " " + world.getName() + "\n");
-        sb.append("Total chunks analyzed: " + scannedChunks.size() + " chunks" + "\n");
-        sb.append("Total blocks analyzed: " + scannerData.count() + " blocks" + "\n");
+        sb.append("Total chunks analyzed: " + format(scannedChunks.size()) + " chunks" + "\n");
+        sb.append("Total blocks analyzed: " + format(scannerData.count()) + " blocks" + "\n");
         sb.append("World average height: " + scannerData.average() + " blocks" + "\n");
         sb.append("World mode height: " + scannerData.mode() + " blocks" + "\n");
         for (Map.Entry<Biome, Statistics> e : biomeData.entrySet()) {
             Statistics s = e.getValue();
-            sb.append(e.getKey() + ": Blocks=" + s.count() + " Avg=" + s.average() + " Mode=" + s.mode() + "\n");
+            sb.append(ChatColor.DARK_GREEN + "" + e.getKey() + "" + ChatColor.RESET + ": Blocks=" + format(s.count()) + " Avg="
+                    + s.average() + " Mode=" + s.mode() + "\n");
         }
-
         return sb.toString();
     }
 
@@ -95,7 +99,7 @@ public class GlobalTerrainScanner {
         command.registerScanner(this);
     }
 
-    private int getTerrainHeight(Location location) {
+    private Block getHighestBlock(Location location) {
 
         int x = location.getBlockX();
         int z = location.getBlockZ();
@@ -105,9 +109,9 @@ public class GlobalTerrainScanner {
             Location l = new Location(world, x, y, z);
             Block b = l.getBlock();
             if ((!b.isPassable() || b.isLiquid()) && !IGNORED.contains(b.getType()))
-                return y;
+                return b;
         }
-        return y;
+        return null;
     }
 
     private static ArrayList<Material> toMaterials(List<String> list) {
@@ -120,5 +124,30 @@ public class GlobalTerrainScanner {
             }
         }
         return out;
+    }
+
+    private static final NavigableMap<Long, String> suffixes = new TreeMap<> ();
+    static {
+      suffixes.put(1_000L, "k");
+      suffixes.put(1_000_000L, "M");
+      suffixes.put(1_000_000_000L, "B");
+      suffixes.put(1_000_000_000_000L, "T");
+      suffixes.put(1_000_000_000_000_000L, "Q");
+      suffixes.put(1_000_000_000_000_000_000L, "Q");
+    }
+    
+    public static String format(long value) {
+      //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+      if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1);
+      if (value < 0) return "-" + format(-value);
+      if (value < 1000) return Long.toString(value); //deal with easy case
+    
+      Entry<Long, String> e = suffixes.floorEntry(value);
+      Long divideBy = e.getKey();
+      String suffix = e.getValue();
+    
+      long truncated = value / (divideBy / 10); //the number part of the output times 10
+      boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+      return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
     }
 }

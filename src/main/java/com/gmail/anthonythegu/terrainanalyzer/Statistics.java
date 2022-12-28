@@ -16,7 +16,7 @@ public class Statistics {
         count++;
     }
 
-    public int average() {
+    public float average() {
         return rollingAverage.get();
     }
 

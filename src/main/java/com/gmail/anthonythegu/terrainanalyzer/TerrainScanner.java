@@ -28,7 +28,7 @@ public class TerrainScanner {
         rollingMode.add(num);
     }
 
-    public int average() {
+    public float average() {
         return rollingAverage.get();
     }
 
