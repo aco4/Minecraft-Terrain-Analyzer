@@ -78,12 +78,14 @@ public class GlobalTerrainScanner {
     public String showStatistics() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(ChatColor.DARK_AQUA + "[TerrainAnalyzer]" + ChatColor.RESET + " " + world + "\n");
-        sb.append("The average height of this world is " + scannerData.average() + " blocks" + "\n");
-        sb.append("The mode height of this world is " + scannerData.mode() + "blocks" + "\n");
+        sb.append(ChatColor.DARK_AQUA + "[TerrainAnalyzer]" + ChatColor.RESET + " " + world.getName() + "\n");
+        sb.append("Total chunks analyzed: " + scannedChunks.size() + " chunks" + "\n");
+        sb.append("Total blocks analyzed: " + scannerData.count() + " blocks" + "\n");
+        sb.append("World average height: " + scannerData.average() + " blocks" + "\n");
+        sb.append("World mode height: " + scannerData.mode() + " blocks" + "\n");
         for (Map.Entry<Biome, Statistics> e : biomeData.entrySet()) {
             Statistics s = e.getValue();
-            sb.append(e.getKey() + ": Avg=" + s.average() + "Mode=" + s.mode() + "\n");
+            sb.append(e.getKey() + ": Blocks=" + s.count() + " Avg=" + s.average() + " Mode=" + s.mode() + "\n");
         }
 
         return sb.toString();
