@@ -1,0 +1,14 @@
+dependency-reduced-pom.xml
+target
+.vscode
+target/original-terrainanalyzer-0.0.4.jar
+target/classes/config.yml
+target/classes/plugin.yml
+target/classes/com/gmail/anthonythegu/terrainanalyzer/CommandAnalyzeTerrain.class
+target/classes/com/gmail/anthonythegu/terrainanalyzer/Main.class
+target/classes/com/gmail/anthonythegu/terrainanalyzer/RollingAverage.class
+target/classes/com/gmail/anthonythegu/terrainanalyzer/Statistics.class
+target/classes/com/gmail/anthonythegu/terrainanalyzer/TerrainScanner.class
+target/classes/com/gmail/anthonythegu/terrainanalyzer/TestDriver.class
+target/maven-archiver/pom.properties
+target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
