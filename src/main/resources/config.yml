@@ -1,0 +1,39 @@
+# Blocks that will not count towards terrain height
+ignored-blocks:
+  - ACACIA_LEAVES
+  - ACACIA_LOG
+  
+  - AZALEA_LEAVES
+
+  - BAMBOO
+
+  - BEEHIVE
+
+  - BIRCH_LEAVES
+  - BIRCH_LOG
+
+  - BROWN_MUSHROOM_BLOCK
+
+  - CACTUS
+
+  - DARK_OAK_LEAVES
+  - DARK_OAK_LOG
+
+  - FLOWERING_AZALEA_LEAVES
+
+  - JUNGLE_LEAVES
+  - JUNGLE_LOG
+
+  - MANGROVE_LEAVES
+  - MANGROVE_LOG
+
+  - MUSHROOM_STEM
+
+  - SPRUCE_LEAVES
+  - SPRUCE_LOG
+
+  - RED_MUSHROOM_BLOCK
+
+# If any of the following blocks would count towards the terrain height, do not use that height
+excluded-blocks:
+  - WATER
