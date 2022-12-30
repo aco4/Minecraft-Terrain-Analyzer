@@ -1,6 +1,8 @@
 package com.gmail.anthonythegu.terrainanalyzer;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -33,6 +35,7 @@ public class GlobalTerrainScanner {
     private Statistics scannerData;
 
     private Hashtable<Biome, Statistics> biomeData;
+    private Hashtable<Integer, Integer> yFrequencyData;
 
     public GlobalTerrainScanner(World world) {
         plugin = Main.getPlugin(Main.class);
@@ -46,6 +49,7 @@ public class GlobalTerrainScanner {
         scannerData = new Statistics();
 
         biomeData = new Hashtable<>();
+        yFrequencyData = new Hashtable<>();
     }
 
     public void scanChunk(Chunk chunk) {
@@ -63,6 +67,15 @@ public class GlobalTerrainScanner {
                         int height = block.getY();
 
                         scannerData.add(height);
+
+                        // If an existing key is passed then the previous value gets replaced by the new
+                        // value.
+                        // Increase the frequency of this height by 1
+                        if (yFrequencyData.containsKey(height)) {
+                            yFrequencyData.put(height, yFrequencyData.get(height) + 1);
+                        } else {
+                            yFrequencyData.put(height, 1);
+                        }
 
                         Biome biome = location.getBlock().getBiome();
                         Statistics biomeStatistics = biomeData.get(biome);
@@ -89,9 +102,31 @@ public class GlobalTerrainScanner {
         sb.append("World mode height: " + scannerData.mode() + " blocks" + "\n");
         for (Map.Entry<Biome, Statistics> e : biomeData.entrySet()) {
             Statistics s = e.getValue();
-            sb.append(ChatColor.DARK_GREEN + "" + e.getKey() + "" + ChatColor.RESET + ": Blocks=" + format(s.count()) + " Avg="
+            sb.append(ChatColor.DARK_GREEN + "" + e.getKey() + "" + ChatColor.RESET + ": Blocks="
+                    + format(s.count()) + " Avg="
                     + s.average() + " Mode=" + s.mode() + "\n");
         }
+
+        if (yFrequencyData.size() >= 10) {
+
+            // Sorted based on value, descending order
+            ArrayList<Map.Entry<Integer, Integer>> sortedEntries = sortValue(yFrequencyData);
+
+            for (int i = 0; i < 5; i++) { // Top 5 values
+                Integer k = sortedEntries.get(i).getKey();
+                Integer v = sortedEntries.get(i).getValue();
+                sb.append(ChatColor.DARK_GREEN + "" + k + "" + ChatColor.RESET + ": Occurrences=" + v + "\n");
+            }
+
+            sb.append("..." + "\n");
+
+            for (int i = sortedEntries.size() - 5; i < sortedEntries.size(); i++) { // Bottom 5 values
+                Integer k = sortedEntries.get(i).getKey();
+                Integer v = sortedEntries.get(i).getValue();
+                sb.append(ChatColor.DARK_GREEN + "" + k + "" + ChatColor.RESET + ": Occurrences=" + v + "\n");
+            }
+        }
+
         return sb.toString();
     }
 
@@ -126,28 +161,43 @@ public class GlobalTerrainScanner {
         return out;
     }
 
-    private static final NavigableMap<Long, String> suffixes = new TreeMap<> ();
+    private static final NavigableMap<Long, String> suffixes = new TreeMap<>();
     static {
-      suffixes.put(1_000L, "k");
-      suffixes.put(1_000_000L, "M");
-      suffixes.put(1_000_000_000L, "B");
-      suffixes.put(1_000_000_000_000L, "T");
-      suffixes.put(1_000_000_000_000_000L, "Q");
-      suffixes.put(1_000_000_000_000_000_000L, "Q");
+        suffixes.put(1_000L, "k");
+        suffixes.put(1_000_000L, "M");
+        suffixes.put(1_000_000_000L, "B");
+        suffixes.put(1_000_000_000_000L, "T");
+        suffixes.put(1_000_000_000_000_000L, "Q");
+        suffixes.put(1_000_000_000_000_000_000L, "Q");
     }
-    
-    public static String format(long value) {
-      //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-      if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1);
-      if (value < 0) return "-" + format(-value);
-      if (value < 1000) return Long.toString(value); //deal with easy case
-    
-      Entry<Long, String> e = suffixes.floorEntry(value);
-      Long divideBy = e.getKey();
-      String suffix = e.getValue();
-    
-      long truncated = value / (divideBy / 10); //the number part of the output times 10
-      boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-      return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+
+    private static String format(long value) {
+        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        if (value == Long.MIN_VALUE)
+            return format(Long.MIN_VALUE + 1);
+        if (value < 0)
+            return "-" + format(-value);
+        if (value < 1000)
+            return Long.toString(value); // deal with easy case
+
+        Entry<Long, String> e = suffixes.floorEntry(value);
+        Long divideBy = e.getKey();
+        String suffix = e.getValue();
+
+        long truncated = value / (divideBy / 10); // the number part of the output times 10
+        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
+        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+    }
+
+    private static ArrayList<Map.Entry<Integer, Integer>> sortValue(Hashtable<Integer, Integer> hashTable) {
+
+        ArrayList<Map.Entry<Integer, Integer>> entries = new ArrayList<>(hashTable.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<Integer, Integer>>() {
+
+            public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue()); // Descending order (3, 2, 1)
+            }
+        });
+        return entries;
     }
 }
